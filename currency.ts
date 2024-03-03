@@ -4,10 +4,10 @@ function cache(method: Function, context: unknown) {
   }
 }
 
-class Currency<const _T, T extends string = _T extends readonly string[] ? Extract<_T[keyof _T], string> : never> {
+class Currency<const T extends readonly string[]> {
   private host = 'https://api.frankfurter.app'
 
-  constructor(private currencies: _T) {}
+  constructor(private currencies: T) {}
 
   private caches: Record<string, number> = {}
 
