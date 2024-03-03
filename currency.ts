@@ -1,20 +1,28 @@
-class Currency<const T> {
+function cache(method: Function, context: unknown) {
+  return function (amount: number, from: string, to: string) {
+    return method.call(context, amount, from, to)
+  }
+}
+
+class Currency<const _T, T extends string = _T extends readonly string[] ? Extract<_T[keyof _T], string> : never> {
   private host = 'https://api.frankfurter.app'
 
-  constructor(private currencies: T) {}
+  constructor(private currencies: _T) {}
 
   private caches: Record<string, number> = {}
-  async convert(amount: number, from: T[keyof T], to: T[keyof T]) {
-    const key = `from=${from}&to=${to}`
+
+  @cache
+  async convert(amount: number, from: Extract<T[keyof T], string>, to: Extract<T[keyof T], string>) {
+    const key = `${from}_${to}`
     if (this.caches[key]) {
       console.log('cache')
-      return this.caches[key]
+      return this.caches[key] * amount
     }
     const response = await fetch(`${this.host}/latest?amount=${amount}&from=${from}&to=${to}`)
-    const data = (await response.json()) as any as CurrencyResult<T[keyof T] extends string ? T[keyof T] : never>
+    const data = (await response.json()) as any as CurrencyResult<Extract<T[keyof T], string>>
 
-    const rate = data.rates[to as T[keyof T] extends string ? T[keyof T] : never]
-    this.caches[key] = rate
+    const rate = data.rates[to as Extract<T[keyof T], string>]
+    this.caches[key] = rate / data.amount
     return rate
   }
 
@@ -37,6 +45,5 @@ interface CurrencyResult<T extends string> {
   date: string
   rates: Record<T, number>
 }
-
 
 export default Currency

@@ -1,5 +1,4 @@
-import Currency from "./currency"
-
+import Currency from './currency'
 
 async function main() {
   const currencyType = ['USD', 'EUR', 'GBP', 'JPY', 'THB'] as const
