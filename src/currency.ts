@@ -13,10 +13,9 @@ function cache(method: Function, _context: any) {
 
 class Currency<const T extends readonly string[] = [], Values extends string = Extract<T[keyof T], string>> {
   private host = 'https://api.frankfurter.app'
+  private caches: Record<string, number> = {}
 
   constructor(private currencies: T) {}
-
-  private caches: Record<string, number> = {}
 
   @cache
   async convert(amount: number, from: Values, to: Values) {
