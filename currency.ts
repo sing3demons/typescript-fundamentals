@@ -1,12 +1,10 @@
-function cache(method: Function, _context: unknown) {
-  // @ts-ignore
+function cache(method: Function, _context: any) {
   return async function (this: any, amount: number, from: string, to: string) {
     const key = `${from}_${to}`
-    if (this.caches[key]) {
-      console.log('cache')
-      return this.caches[key] * amount
-    }
-    const result = await method.bind(this)(amount, from, to)
+    if (this.caches[key]) return this.caches[key] * amount
+
+    // const result = await method.bind(this)(amount, from, to)
+    const result = await method.call(this, amount, from, to)
     const rate = result.rates[to]
     this.caches[key] = rate / result.amount
     return rate
